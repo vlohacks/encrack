@@ -6,7 +6,7 @@ tool for cracking openssl enc style encrypted files. Since there is no hash of t
 * c++11 compiler (for threads)
 
 ## compilation
-g++ -o encrack encrack.cpp -lpthread -lcrypto
+`make` should do it
 
 ## usage example
 ```
