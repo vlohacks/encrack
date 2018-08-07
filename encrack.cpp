@@ -73,6 +73,11 @@ unsigned char * load_ciphertext(char * filename, unsigned char * salt, size_t * 
 void usage(char * progname)
 {
 	printf("Usage: %s -w <word_list> -i <input_file> -c <ciphers_list> [-t <num_threads>]\n", progname);
+	printf("	-w <word_list>:		a wordlist containing passwordz\n");
+	printf("	-i <input_file>:	the encrypted file\n");
+	printf("	-c <ciphers_list>:	list with ciphers to probe for\n");
+	printf("	-t <num_threads>:	change number of concurrent threads\n");
+	printf("				(optional, default: 4)\n");
 	exit(1);
 }
 
