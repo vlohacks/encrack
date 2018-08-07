@@ -1,4 +1,4 @@
-### encrack
+# encrack
 tool for cracking openssl enc style encrypted files. Since there is no hash of the password or something like that stored in the file, successful decryption must be determined from plaintext directly. Currently it matches the first 32 bytes for being 7 bit clean ascii. More matching methods coming soon
 
 ## prerequirements
