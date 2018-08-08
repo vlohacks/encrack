@@ -20,10 +20,14 @@ void worker(const int threadnum, const std::vector<char*>& cipher_list, const st
 
 char * load_wordlist(std::vector<char*>& list, char* filename)
 {
-	FILE* f = fopen(filename, "rb");
 	char* data;
 	char* p;
 	size_t length;
+	
+	FILE* f = fopen(filename, "rb");
+
+	if (f == NULL)
+		return NULL;
 	
 	fseek(f, 0, SEEK_END);	
 	length = ftell(f);
@@ -51,15 +55,18 @@ unsigned char * load_ciphertext(char * filename, unsigned char * salt, size_t * 
 
 	FILE * f = fopen(filename, "rb");
 
+	if (f == NULL)
+		return NULL;
+
 	fseek(f, 0, SEEK_END);
 	*ct_length = ftell(f) - sizeof(tmp) - PKCS5_SALT_LEN;
 	fseek(f, 0, SEEK_SET);
 
 	fread(tmp, strlen(magic), 1, f);
 	if (memcmp(tmp, magic, sizeof(tmp))) {
-		printf("Error: bad magic: %s\n", tmp);
+		fprintf(stderr, "Error: bad magic: %s\n", tmp);
 		fclose(f);
-		return 0;
+		return NULL;
 	}
 	fread(salt, PKCS5_SALT_LEN, 1, f);
 
@@ -123,13 +130,29 @@ int main(int argc, char** argv)
 	}
 
 	password_list_blob = load_wordlist(password_list, passwords_file);
-	printf("* Loaded %lu password(s)\n", password_list.size());
+	if (password_list_blob == NULL) {
+		fprintf(stderr, "! ERROR: Could not load password list: %s\n", passwords_file);
+		return 1;
+	} else {
+		printf("* Loaded %lu password(s)\n", password_list.size());
+	}
 
 	cipher_list_blob = load_wordlist(cipher_list, ciphers_file);
-	printf("* Loaded %lu cipher(s)\n", cipher_list.size());
+
+	if (cipher_list_blob == NULL) {
+		fprintf(stderr, "! ERROR: Could not load ciphers list: %s\n", ciphers_file);
+		return 1;
+	} else {
+		printf("* Loaded %lu cipher(s)\n", cipher_list.size());
+	}
 
 	ct = load_ciphertext(input_file, salt, &ct_length);
-	printf("* Loaded %lu bytes ciphertext\n", ct_length);
+	if (ct == NULL) {
+		fprintf(stderr, "! ERROR: Could not load input file: %s\n", input_file);
+		return 1;
+	} else {
+		printf("* Loaded %lu bytes ciphertext\n", ct_length);
+	}
 
 	printf("* running %d thread(s)...\n", num_threads);
 	for (i = 0; i < num_threads; i++)
@@ -189,7 +212,7 @@ void worker(const int threadnum, const std::vector<char*>& cipher_list, const st
 		ciphername = cipher_list[j];
 		cipher = EVP_get_cipherbyname(ciphername);
 		if (cipher == NULL) {
-			printf("[%02d]: warning: invalid cipher: '%s'\n", threadnum, ciphername);
+			fprintf(stderr, "[%02d]: warning: invalid cipher: '%s'\n", threadnum, ciphername);
 			continue;
 		}
 		//iv_size = EVP_CIPHER_iv_length(cipher);
