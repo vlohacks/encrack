@@ -5,16 +5,16 @@
 
 class Matcher
 {
-protected:	
-	const MatcherOptions& _options;
+protected:  
+    const MatcherOptions& _options;
 
 public:
-	Matcher(const MatcherOptions& options)
-		: _options(options)
-	{}
-	virtual ~Matcher()
-	{}
-	virtual bool match(const unsigned char* pt, size_t size) const = 0;
+    Matcher(const MatcherOptions& options)
+        : _options(options)
+    {}
+    virtual ~Matcher()
+    {}
+    virtual bool match(const unsigned char* pt, size_t size) const = 0;
 };
 
 #endif
