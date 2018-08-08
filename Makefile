@@ -6,14 +6,14 @@ CXXFLAGS	= -Wall -O2
 LDFLAGS		= -lpthread -lcrypto
 
 all: $(OBJ)
-	$(CXX) $(CCFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)
 
 .PHONY: clean
 clean: 
 	rm -f $(BIN) $(OBJ)
 
 %.o: %.cpp
-	$(CXX) $(CCFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 
 

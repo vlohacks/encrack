@@ -9,7 +9,7 @@
 
 void printhex(unsigned char * p, size_t len)
 {
-	int i;
+	size_t i;
 	for (i = 0; i < len; i++)
 		printf("%02X", *p++);
 
@@ -90,11 +90,10 @@ int main(int argc, char** argv)
 	char * cipher_list_blob;
 	int i;
 
-	char * passwords_file;
-	char * ciphers_file;
-	char * input_file;
-		
-
+	char * passwords_file = NULL;
+	char * ciphers_file = NULL;
+	char * input_file = NULL;
+	
 	std::vector<char*> password_list;
 	std::vector<char*> cipher_list;
 	std::vector<std::thread> workers;
@@ -124,13 +123,13 @@ int main(int argc, char** argv)
 	}
 
 	password_list_blob = load_wordlist(password_list, passwords_file);
-	printf("* Loaded %d password(s)\n", password_list.size());
+	printf("* Loaded %lu password(s)\n", password_list.size());
 
 	cipher_list_blob = load_wordlist(cipher_list, ciphers_file);
-	printf("* Loaded %d cipher(s)\n", cipher_list.size());
+	printf("* Loaded %lu cipher(s)\n", cipher_list.size());
 
 	ct = load_ciphertext(input_file, salt, &ct_length);
-	printf("* Loaded %d bytes ciphertext\n", ct_length);
+	printf("* Loaded %lu bytes ciphertext\n", ct_length);
 
 	printf("* running %d thread(s)...\n", num_threads);
 	for (i = 0; i < num_threads; i++)
@@ -166,7 +165,7 @@ void pkcs_unpad(unsigned char * pt, size_t size)
 
 void worker(const int threadnum, const std::vector<char*>& cipher_list, const std::vector<char*>& password_list, const size_t offset, const size_t increment, const unsigned char* salt, const unsigned char* ct, const size_t ct_length)
 {
-	size_t iv_size, k_size;
+	//size_t k_size, iv_size;
 	unsigned char * pt;
 	unsigned char key[EVP_MAX_KEY_LENGTH];
 	unsigned char iv[EVP_MAX_IV_LENGTH];
@@ -193,8 +192,8 @@ void worker(const int threadnum, const std::vector<char*>& cipher_list, const st
 			printf("[%02d]: warning: invalid cipher: '%s'\n", threadnum, ciphername);
 			continue;
 		}
-		iv_size = EVP_CIPHER_iv_length(cipher);
-		k_size = EVP_CIPHER_key_length(cipher);
+		//iv_size = EVP_CIPHER_iv_length(cipher);
+		//k_size = EVP_CIPHER_key_length(cipher);
 
 		for (i = offset; i < password_list.size(); i += increment) {
 			passwd = password_list[i];
