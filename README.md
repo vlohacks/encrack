@@ -1,8 +1,12 @@
 # encrack
-tool for cracking openssl enc style encrypted files. Since there is no hash of the password or something like that stored in the file, successful decryption must be determined from plaintext directly. Currently it matches the first 32 bytes for being 7 bit clean ascii. More matching methods coming soon
+tool for cracking openssl enc style encrypted files. Since there is no hash of the password or something like that stored in the file, successful decryption must be determined from plaintext directly. Currently 2 matching modules are implemented
+* firstascii:	checks the first numBytes being ascii 7 bit
+* libmagic:		uses libmagic to match data against mime type matchType.
+	(note: matchType can be a substring. text/plain also includes text/plain; charset: utf-16)
 
 ## prerequirements
 * openssl library (-lcrypto, debian: `apt-get install libssl-dev`)
+* libmagic (-lmagic, debian `apt-get install libmagic-dev`)
 * c++11 compiler (for threads)
 
 ## compilation
@@ -10,17 +14,16 @@ tool for cracking openssl enc style encrypted files. Since there is no hash of t
 
 ## usage example
 ```
-$ ./encrack -w ./testpwd.list -i ./test.txt.enc -c ./ciphers_cbc.txt  
+$ ./encrack -m firstascii -i ./test.txt.enc -w ./testpwd.list -c ./ciphers_aes_cbc.txt  -t 1
 * Loaded 9 password(s)
-* Loaded 18 cipher(s)
+* Loaded 3 cipher(s)
 * Loaded 240 bytes ciphertext
-* running 4 thread(s)...
+* running 1 thread(s)...
+[MATCHER] Warning: setting default value of 'numBytes' to value '32'
+[MATCHER] use -o numBytes=<value> to set user defined value
 [00]: starting...
-[01]: starting...
-[02]: starting...
-[03]: starting...
-[01]: found candidate!
-password : pfaelzersaumagen
+[00]: found candidate!
+password : waynesburg
 cipher   : aes-256-cbc
 plaintext: Yo supergeheimer text!
 Dieser Text ist so geheim, dass es geheimer nicht geht. Supergeheim. 
@@ -29,9 +32,6 @@ Das ist alles so dermaßen krass geheim, da dreht es dir den Helm um!
 Wirklich!
 
 
-[02]: finishing...
-[03]: finishing...
-[01]: finishing...
 [00]: finishing...
 * finished, all threads ended
 ```
@@ -50,14 +50,15 @@ Rocking rockyou.txt on my poor little Core-i5 (i need a threadripper... ...why? 
 $ cat /proc/cpuinfo |grep model|sort -u
 model		: 58
 model name	: Intel(R) Core(TM) i5-3330 CPU @ 3.00GHz
-$ time ./encrack -w ~/Downloads/rockyou.txt -i ./test.txt.enc -c ./ciphers_cbc.txt -t4
+$ time ./encrack -m firstascii -o numBytes=32 -i ./test.txt.enc -w ~/Downloads/rockyou.txt -c ./ciphers_cbc.txt 
+* added matcher option numBytes: 32
 * Loaded 14344390 password(s)
 * Loaded 18 cipher(s)
 * Loaded 240 bytes ciphertext
 * running 4 thread(s)...
 [00]: starting...
-[01]: starting...
 [02]: starting...
+[01]: starting...
 [03]: starting...
 [00]: found candidate!
 password : waynesburg
@@ -69,13 +70,13 @@ Das ist alles so dermaßen krass geheim, da dreht es dir den Helm um!
 Wirklich!
 
 
+[02]: finishing...
 [00]: finishing...
 [01]: finishing...
-[02]: finishing...
 [03]: finishing...
 * finished, all threads ended
 
-real	6m59,103s
-user	27m34,233s
-sys	0m0,443s
+real	6m56,269s
+user	27m34,244s
+sys		0m0,234s
 ```

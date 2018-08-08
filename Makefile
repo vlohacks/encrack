@@ -1,9 +1,9 @@
 CC		= gcc
 CXX		= g++
-OBJ		= encrack.o
+OBJ		= encrack.o MatcherOptions.o MatcherFirstAscii.o MatcherLibMagic.o MatcherFactory.o Wordlist.o Subject.o Worker.o
 BIN		= encrack
 CXXFLAGS	= -Wall -O2
-LDFLAGS		= -lpthread -lcrypto
+LDFLAGS		= -lpthread -lcrypto -lmagic
 
 all: $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $(BIN) $(OBJ) $(LDFLAGS)
