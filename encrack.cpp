@@ -138,7 +138,6 @@ int main(int argc, char** argv)
 	}
 
 	cipher_list_blob = load_wordlist(cipher_list, ciphers_file);
-
 	if (cipher_list_blob == NULL) {
 		fprintf(stderr, "! ERROR: Could not load ciphers list: %s\n", ciphers_file);
 		return 1;
@@ -241,7 +240,6 @@ void worker(const int threadnum, const std::vector<char*>& cipher_list, const st
 		
 			if(!EVP_DecryptFinal_ex(ctx, pt+outlen, &outlen)) 
 				continue;
-
 
 			if (validate(pt, 32)) {
 				pkcs_unpad(pt, ct_length);
