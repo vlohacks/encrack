@@ -23,6 +23,8 @@ void usage(char* progname)
     printf("    -m <matcher_name>:  use the specified matcher module\n");
     printf("    -o <param=value>:   set the matcher parameter param to value value\n"); 
     printf("                        (can be used multiple times for multiple values\n");
+    printf("    -s                  suggest and outpt ciphers for given subject only and exit\n");
+    printf("    -h                  this help\n");
 
     exit(1);
 }
@@ -30,11 +32,12 @@ void usage(char* progname)
 int main(int argc, char** argv)
 {
     int i;
+    bool suggestOnly = false;
 
-    char* passwordFile = NULL;
-    char* cipherFile = NULL;
-    char* inputFile = NULL;
-    
+    char* passwordFile = nullptr;
+    char* cipherFile = nullptr;
+    char* inputFile = nullptr;
+        
     Subject subject;
     MatcherOptions matcherOptions;
     
@@ -43,7 +46,7 @@ int main(int argc, char** argv)
     
     int numThreads = 4;
 
-    while ((i = getopt(argc, argv, "i:w:t:c:m:o:h")) != -1) {
+    while ((i = getopt(argc, argv, "i:w:t:c:m:o:hs")) != -1) {
         switch(i) {
             case 'i':
                 inputFile = optarg;
@@ -71,6 +74,9 @@ int main(int argc, char** argv)
                     matcherOptions.addOption(key, val);
                 }
                 break;
+            case 's':
+                suggestOnly = true;
+                break;
             case 'h':
             default:
                 usage(argv[0]);
@@ -81,20 +87,39 @@ int main(int argc, char** argv)
     Wordlist passwordList(numThreads);
     Wordlist cipherList(1);
     
-    
     if (matcherName == "h") {
         MatcherFactory::printMatcherHelp();
         return 1;
     }
     
-    if (!MatcherFactory::checkAvailability(matcherName)) {
-        fprintf(stderr, "Error: invalid matcher option.\n");
-        fprintf(stderr, "Please specify a valid matcher with the -m option.\n");
-        fprintf(stderr, "Use -mh to get a list of available matchers\n");
+    try {
+        subject.loadFile(inputFile);
+        printf("* Loaded %lu bytes ciphertext\n", subject.getCipherTextLength());
+    } catch (std::exception& e) {
+        fprintf(stderr, "! ERROR: Could not load input file: %s\n", inputFile);
         return 1;
-    } else {
-        MatcherFactory::setDefaultValues(matcherName, matcherOptions);
     }
+    
+    // if no ciphers list is provided, use suggested list
+    if (cipherFile == nullptr || suggestOnly == true) {
+        CipherSuggester::suggest(subject, cipherList);
+        if (suggestOnly) {
+            printf("Suggested ciphers:\n");
+            for (const auto& it : cipherList.getList(0))
+                printf("%s\n", it.c_str());
+            return 0;
+        } else {
+            printf("* Warning: no cipher list provided, using auto-suggested list\n");
+        }
+    } else {
+        try {
+            cipherList.loadFile(cipherFile);
+        } catch (std::exception& e) {
+            fprintf(stderr, "! ERROR: Could not load ciphers list: %s\n", cipherFile);
+            return 1;
+        }
+    }
+    printf("* Loaded %lu cipher(s)\n", cipherList.getSize());
 
     try {
         passwordList.loadFile(passwordFile);
@@ -104,20 +129,13 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    try {
-        cipherList.loadFile(cipherFile);
-        printf("* Loaded %lu cipher(s)\n", cipherList.getSize());
-    } catch (std::exception& e) {
-        fprintf(stderr, "! ERROR: Could not load ciphers list: %s\n", cipherFile);
+    if (!MatcherFactory::checkAvailability(matcherName)) {
+        fprintf(stderr, "Error: invalid matcher option.\n");
+        fprintf(stderr, "Please specify a valid matcher with the -m option.\n");
+        fprintf(stderr, "Use -mh to get a list of available matchers\n");
         return 1;
-    }
-
-    try {
-        subject.loadFile(inputFile);
-        printf("* Loaded %lu bytes ciphertext\n", subject.getCipherTextLength());
-    } catch (std::exception& e) {
-        fprintf(stderr, "! ERROR: Could not load input file: %s\n", inputFile);
-        return 1;
+    } else {
+        MatcherFactory::setDefaultValues(matcherName, matcherOptions);
     }
     
     printf("* Running %d thread(s)...\n", numThreads);
