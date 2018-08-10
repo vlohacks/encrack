@@ -7,6 +7,7 @@
 
 #include "MatcherFactory.hpp"
 #include "MatcherOptions.hpp"
+#include "CipherSuggester.hpp"
 #include "Subject.hpp"
 #include "Wordlist.hpp"
 #include "Worker.hpp"
@@ -34,14 +35,12 @@ int main(int argc, char** argv)
     char* cipherFile = NULL;
     char* inputFile = NULL;
     
-    Wordlist passwordList;
-    Wordlist cipherList;
     Subject subject;
     MatcherOptions matcherOptions;
     
     std::vector<Worker*> workers;
     std::string matcherName;
-
+    
     int numThreads = 4;
 
     while ((i = getopt(argc, argv, "i:w:t:c:m:o:h")) != -1) {
@@ -78,6 +77,10 @@ int main(int argc, char** argv)
                 break;
         }
     }
+
+    Wordlist passwordList(numThreads);
+    Wordlist cipherList(1);
+    
     
     if (matcherName == "h") {
         MatcherFactory::printMatcherHelp();

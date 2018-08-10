@@ -38,16 +38,18 @@ void Worker::runner()
 
     printf("[%02d]: Starting...\n", _threadId);
 
-    for (auto cipherIt = _cipherList.getList().begin(); cipherIt != _cipherList.getList().end(); cipherIt++) {
-        cipher = EVP_get_cipherbyname(*cipherIt);
+    for (auto cipherIt = _cipherList.getList(0).begin(); cipherIt != _cipherList.getList(0).end(); cipherIt++) {
+        cipher = EVP_get_cipherbyname(cipherIt->c_str());
         if (cipher == NULL) {
-            fprintf(stderr, "[%02d]: Warning: Invalid cipher: '%s'\n", _threadId, *cipherIt);
+            fprintf(stderr, "[%02d]: Warning: Invalid cipher: '%s'\n", _threadId, cipherIt->c_str());
+            _stats += _passwordList.getSize(_threadId);
             continue;
         }
         //iv_size = EVP_CIPHER_iv_length(cipher);
         //k_size = EVP_CIPHER_key_length(cipher);
 
-        for (auto passwdIt = _passwordList.getList().begin() + _threadId; passwdIt < _passwordList.getList().end(); passwdIt += _stride) {
+        for (auto passwdIt = _passwordList.getList(_threadId).begin(); passwdIt != _passwordList.getList(_threadId).end(); passwdIt ++) {
+            _stats++;
             /*
             if (!PKCS5_PBKDF2_HMAC(passwd, strlen(passwd), salt, sizeof(salt), iter, digest, k_size+iv_size, tmpkeyiv)) {
                 printf("oh no pbkdf2\n");
@@ -56,7 +58,7 @@ void Worker::runner()
                 memcpy(key, tmpkeyiv, k_size);
             memcpy(iv, tmpkeyiv+k_size, iv_size);*/
 
-            if (!EVP_BytesToKey(cipher, digest, _subject.getSalt(), reinterpret_cast<const unsigned char*>(*passwdIt), strlen(*passwdIt), 1, key, iv)) {
+            if (!EVP_BytesToKey(cipher, digest, _subject.getSalt(), reinterpret_cast<const unsigned char*>(passwdIt->c_str()), strlen(passwdIt->c_str()), 1, key, iv)) {
                 printf("EVP_BytesToKey failed\n");
                 exit(1);
             }
@@ -75,7 +77,7 @@ void Worker::runner()
 
             if (matcher->match(pt, pt_length)) {
                 pkcsUnpad(pt, _subject.getCipherTextLength());
-                printf("[%02d]: Found candidate!\nPassword : %s\nCipher   : %s\nPlaintext: %s\n", _threadId, *passwdIt, *cipherIt, pt);
+                printf("[%02d]: Found candidate!\nPassword : %s\nCipher   : %s\nPlaintext: %s\n", _threadId, passwdIt->c_str(), cipherIt->c_str(), pt);
             }
         }
     }

@@ -18,6 +18,8 @@ private:
     const size_t _stride;
     const std::string _matcherName;
     const MatcherOptions& _matcherOptions;
+    
+    volatile unsigned long _stats;
     std::thread _thread;
     
     void runner();
@@ -32,6 +34,7 @@ public:
         , _stride(stride)
         , _matcherName(matcherName)
         , _matcherOptions(matcherOptions)
+        , _stats(0)
     {}
 
     ~Worker()

@@ -1,6 +1,6 @@
 CC		= gcc
 CXX		= g++
-OBJ		= encrack.o MatcherOptions.o MatcherFirstAscii.o MatcherLibMagic.o MatcherFactory.o Wordlist.o Subject.o Worker.o
+OBJ		= encrack.o MatcherOptions.o MatcherFirstAscii.o MatcherLibMagic.o MatcherFactory.o Wordlist.o Subject.o Worker.o CipherSuggester.o
 BIN		= encrack
 CXXFLAGS	= -Wall -O2
 LDFLAGS		= -lpthread -lcrypto -lmagic

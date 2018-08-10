@@ -2,21 +2,24 @@
 #define WORDLIST_HPP
 
 #include <vector>
+#include <string>
 
 class Wordlist
 {
 private:
-    char* _data;
-    std::vector<char*> _list;
-
+    std::vector<std::vector<std::string> > _list;
+    const size_t _numPools;
+    
 public:
-    Wordlist();
+    Wordlist(const size_t numPools);
     ~Wordlist();
     
     void loadFile(const char * filename);
-    const char * getEntry(const size_t index) const { return _list[index]; }
-    const size_t getSize() const                    { return _list.size(); }
-    const std::vector<char*>& getList() const       { return _list; }
+    const std::vector<std::string>& getList(const size_t pool) const    { return _list[pool]; }
+    const size_t getSize(const size_t pool) const                       { return _list[pool].size(); }
+    const size_t getSize();
+    const size_t getNumPools() const                                    { return _numPools; }
+    void addWord(const std::string& item);
 };
 
 #endif
