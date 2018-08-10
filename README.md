@@ -1,10 +1,14 @@
 # encrack
-tool for cracking openssl enc style encrypted files. Since there is no hash of the password or something like that stored in the file, successful decryption must be determined from plaintext directly. Currently 2 matching modules are implemented
+tool for cracking openssl enc style encrypted files. Since there is no hash of the password or something like that stored in the file, successful decryption must be determined from plaintext directly.
 
 ## Features
+### Matching modules
+The program allows to add easily different matching modules. Currently 2 modules are supported which most likely cover most usecases:
 * firstascii:	checks the first numBytes being ascii 7 bit
 * libmagic:		uses libmagic to match data against mime type matchType.
 	(note: matchType can be a substring. text/plain also includes text/plain; charset: utf-16)
+### Cipher suggester
+If no cipher is known the program autogenerates a suitable list of ciphers. The suggester matches ciphers whose block size matches into the cipher text.
 
 ## Prerequirements
 * openssl library (-lcrypto, debian: `apt-get install libssl-dev`)
