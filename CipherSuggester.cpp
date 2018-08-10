@@ -40,8 +40,7 @@ void CipherSuggester::suggest(const Subject& subject, Wordlist& wordlist)
 {
     std::vector<std::string> ciphers;
     arg_t args = { .ciphers = &ciphers, .subject = &subject };
-    
-    OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS, NULL);
+
     OBJ_NAME_do_all(OBJ_NAME_TYPE_CIPHER_METH, CipherSuggester::doallCallback, reinterpret_cast<void*>(&args));
     
     // sort suitable ciphers by their blocksize, descending

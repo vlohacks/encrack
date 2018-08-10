@@ -86,6 +86,8 @@ int main(int argc, char** argv)
                 break;
         }
     }
+    
+    OpenSSL_add_all_algorithms();
 
     Wordlist passwordList(numThreads);
     Wordlist cipherList(1);
