@@ -1,18 +1,50 @@
 # encrack
 tool for cracking openssl enc style encrypted files. Since there is no hash of the password or something like that stored in the file, successful decryption must be determined from plaintext directly. Currently 2 matching modules are implemented
+
+## Features
 * firstascii:	checks the first numBytes being ascii 7 bit
 * libmagic:		uses libmagic to match data against mime type matchType.
 	(note: matchType can be a substring. text/plain also includes text/plain; charset: utf-16)
 
-## prerequirements
+## Prerequirements
 * openssl library (-lcrypto, debian: `apt-get install libssl-dev`)
 * libmagic (-lmagic, debian `apt-get install libmagic-dev`)
 * c++11 compiler (for threads)
 
-## compilation
+## Compilation
 `make` should do it
 
-## usage example
+## Usage Examples
+### Crack textfile
+* Crack secret.txt.enc 
+* Using passwords from wordlist.txt
+* Match for first 32 ascii characters (default value)
+* Auto-use suggested ciphers
+```
+encrack -i ./secret.txt.enc -w ./wordlist.txt -m firstascii 
+```
+### Crack binary data
+* Crack secretpic.jpg.enc 
+* Using passwords from wordlist.txt
+* Match for image/jpeg using libmagic
+```
+encrack -i ./secretpic.jpg.enc -w ./wordlist.txt -m libmagic -o matchType=image/jpeg 
+```
+### Suggest ciphers
+* Output suggested ciphers for secret.txt.enc and exit
+```
+encrack -i ./secret.txt.enc -s
+```
+### Crack textfile using specific ciphers
+* Crack secret.txt.enc 
+* Using passwords from wordlist.txt
+* Match for first 32 ascii characters (default value)
+* use cipher list from ciphers.txt
+```
+encrack -i ./secret.txt.enc -w ./wordlist.txt -m firstascii -c ./ciphers.txt
+```
+
+## example output
 ```
 $ ./encrack -m firstascii -i ./test.txt.enc -w ./testpwd.list -c ./ciphers_aes_cbc.txt  -t 1
 * Loaded 9 password(s)
@@ -43,6 +75,7 @@ Wirklich!
 * maybe other HMAC algorithms (currently default SHA256 only is supported)
 * method to quit after first match
 * output stats (progress)
+* more output options for candidates (hexdump, into file)
 
 ## Benchmark
 Rocking rockyou.txt on my poor little Core-i5 (i need a threadripper... ...why? ...why not?)
