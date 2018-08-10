@@ -1,18 +1,19 @@
 #include "MatcherLibMagic.hpp"
 
+#include <stdexcept>
+
 MatcherLibMagic::MatcherLibMagic(const MatcherOptions& options)
-                : Matcher(options)
+    : Matcher(options)
 {
     _matchType = options.getOption("matchType");
     _magicCookie = magic_open(MAGIC_MIME);
-    if (_magicCookie == NULL) {
-        printf("scheisse1");
-                exit(1);
-    }
-    if (magic_load(_magicCookie, NULL) != 0) {
-        printf("scheisse2");
-        exit(1);
-    }               // TODO handle errors
+    
+    if (_magicCookie == NULL)
+        throw std::runtime_error("Error while initializing libmagic");
+   
+    if (magic_load(_magicCookie, NULL) != 0)
+        throw std::runtime_error("Error while loading default magic database");
+
 }
 
 MatcherLibMagic::~MatcherLibMagic()
