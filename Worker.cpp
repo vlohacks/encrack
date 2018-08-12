@@ -19,6 +19,8 @@ void Worker::pkcsUnpad(unsigned char* pt, size_t size)
 void Worker::runner()
 {
     //size_t k_size, iv_size;
+    size_t decryptLength;
+    size_t blockSizeDifference;
     unsigned char * pt;
     unsigned char key[EVP_MAX_KEY_LENGTH];
     unsigned char iv[EVP_MAX_IV_LENGTH];
@@ -40,11 +42,17 @@ void Worker::runner()
 
     for (auto cipherIt = _cipherList.getList(0).begin(); cipherIt != _cipherList.getList(0).end(); cipherIt++) {
         cipher = EVP_get_cipherbyname(cipherIt->c_str());
+        
         if (cipher == NULL) {
             fprintf(stderr, "[%02d]: Warning: Invalid cipher: '%s'\n", _threadId, cipherIt->c_str());
             _stats += _passwordList.getSize(_threadId);
             continue;
         }
+        
+        decryptLength = _subject.getCipherTextLimit();
+        if ((blockSizeDifference = decryptLength % EVP_CIPHER_block_size(cipher)) != 0)
+            decryptLength += (EVP_CIPHER_block_size(cipher) - blockSizeDifference);
+            
         //iv_size = EVP_CIPHER_iv_length(cipher);
         //k_size = EVP_CIPHER_key_length(cipher);
 
@@ -65,18 +73,27 @@ void Worker::runner()
 
             EVP_DecryptInit_ex(ctx, cipher, NULL, key, iv);
 
-            if(!EVP_DecryptUpdate(ctx, pt, &outlen, _subject.getCipherText(), _subject.getCipherTextLength())) 
+            if(!EVP_DecryptUpdate(ctx, pt, &outlen, _subject.getCipherText(), decryptLength))
                 continue;
 
             pt_length = outlen;
+            
+            // do final round only if full ciphertext has been decrypted, since it tries to validate padding, it will fail on incomplete decryption.
+            if (decryptLength == _subject.getCipherTextLength()) {
+                if(!EVP_DecryptFinal_ex(ctx, pt+outlen, &outlen))
+                    continue;
                     
-            if(!EVP_DecryptFinal_ex(ctx, pt+outlen, &outlen)) 
-                continue;
-
-            pt_length += outlen;
-
+                pt_length += outlen;
+            } else {
+                // the API does not report the full decrypt length since it awaits the final round.
+                // so we just set it hardcore to the decrypt length
+                pt_length = decryptLength;
+            }
+            
             if (matcher->match(pt, pt_length)) {
-                pkcsUnpad(pt, _subject.getCipherTextLength());
+                // unpad only if full ciphertext has been decrypted
+                if (decryptLength == _subject.getCipherTextLength())
+                    pkcsUnpad(pt, _subject.getCipherTextLength());
                 printf("[%02d]: Found candidate!\nPassword : %s\nCipher   : %s\nPlaintext: %s\n", _threadId, passwdIt->c_str(), cipherIt->c_str(), pt);
             }
         }

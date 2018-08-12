@@ -5,6 +5,7 @@
 
 Subject::Subject()
     : _cipherText(nullptr)
+    , _decryptLimit(0)
 {}
 
 Subject::~Subject()

@@ -43,13 +43,15 @@ encrack -i ./secretpic.jpg.enc -w ./wordlist.txt -m libmagic -o matchType=image/
 ```
 encrack -i ./secret.txt.enc -w ./wordlist.txt -m firstascii -c ./ciphers.txt
 ```
-### Crack subject, search for a specific string
+### Crack file, search for a specific string with
 * crack 2nd_pm.s3m.enc (which is a encrypted S3M music module)
 * Using passwords from wordlist.txt
 * match for the SCRM magic at position 44 which is specific for this file format
 * use cipher list from ciphers_cbc.txt
+* limit decryption length to 48 bytes to save a lot of time since the header starts at byte 44 and is 4 bytes long (encrack takes care for itself rounding up to block size)
+* use 32 threads since we pretend to have such a supercool threadripper machine ;-)
 ```
-./encrack -i ./2nd_pm.s3m.enc -w ./wordlist.txt -m string -o string='SCRM' -o position=44 -c ./ciphers_cbc.txt
+./encrack -i ./2nd_pm.s3m.enc -w ./wordlist.txt -m string -o string='SCRM' -o position=44 -c ./ciphers_cbc.txt -l48 -t32
 ```
 
 
