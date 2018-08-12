@@ -38,8 +38,6 @@ void Worker::runner()
     digest = EVP_sha256();
     ctx = EVP_CIPHER_CTX_new();
 
-    printf("[%02d]: Starting...\n", _threadId);
-
     for (auto cipherIt = _cipherList.getList(0).begin(); cipherIt != _cipherList.getList(0).end(); cipherIt++) {
         cipher = EVP_get_cipherbyname(cipherIt->c_str());
         
@@ -100,7 +98,6 @@ void Worker::runner()
     }
 
     EVP_CIPHER_CTX_free(ctx);
-    printf("[%02d]: Finishing...\n", _threadId);
     delete[] pt;
     delete matcher;
 }
