@@ -59,7 +59,7 @@ bool MatcherString::match(const unsigned char* pt, const size_t size) const
     bool found = false;
     size_t i;
         
-    for (auto itSub = subject.begin() + _position; itSub != subject.end() - _position; itSub++) {
+    for (auto itSub = subject.begin() + _position; itSub != subject.end() - (_string.size() - 1); itSub++) {
         found = true;
         for (i = 0; i < _string.size(); i++) {
             if (_string[i] != itSub[i]) {
