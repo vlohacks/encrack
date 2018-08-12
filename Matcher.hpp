@@ -14,7 +14,7 @@ public:
     {}
     virtual ~Matcher()
     {}
-    virtual bool match(const unsigned char* pt, size_t size) const = 0;
+    virtual bool match(const unsigned char* pt, const size_t size) const = 0;
 };
 
 #endif

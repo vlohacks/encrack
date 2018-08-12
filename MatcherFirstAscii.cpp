@@ -9,7 +9,7 @@ MatcherFirstAscii::MatcherFirstAscii(const MatcherOptions& options)
 MatcherFirstAscii::~MatcherFirstAscii()
 {}
 
-bool MatcherFirstAscii::match(const unsigned char * pt, size_t size) const
+bool MatcherFirstAscii::match(const unsigned char* pt, const size_t size) const
 {
     size_t i;
 

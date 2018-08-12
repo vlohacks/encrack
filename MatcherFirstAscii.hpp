@@ -7,7 +7,6 @@ class MatcherFirstAscii : public Matcher
 {
 private:
     size_t _numBytes;
-    void initDefaults();
 
 public:
     MatcherFirstAscii(const MatcherOptions& options);

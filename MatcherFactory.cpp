@@ -17,11 +17,12 @@ void MatcherFactory::printMatcherHelp()
 
 void MatcherFactory::setDefaultValues(const std::string& name, MatcherOptions& options)
 {
-    if (name == "firstascii")   {
+    if (name == "firstascii") {
         options.setDefaultValue("numBytes", "32");
-    }
-    else if (name == "libmagic")    { 
+    } else if (name == "libmagic") { 
         options.setDefaultValue("matchType", "text/plain");
+    } else if (name == "string") { 
+        options.setDefaultValue("string", "");
     }
 }
 
@@ -30,9 +31,10 @@ Matcher* MatcherFactory::getMatcherByName(const std::string& name, const Matcher
     Matcher* matcher = nullptr;
     if (name == "firstascii")   {
         matcher = new MatcherFirstAscii(options); 
-    }
-    else if (name == "libmagic")    { 
+    } else if (name == "libmagic") { 
         matcher = new MatcherLibMagic(options); 
+    } else if (name == "string") {
+        matcher = new MatcherString(options);
     }
     return matcher;
 }

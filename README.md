@@ -4,9 +4,10 @@ tool for cracking openssl enc style encrypted files. Since there is no hash of t
 ## Features
 ### Matching modules
 The program allows to add easily different matching modules. Currently 2 modules are supported which most likely cover most usecases:
-* firstascii:	checks the first numBytes being ascii 7 bit
-* libmagic:		uses libmagic to match data against mime type matchType.
+* firstascii: checks the first numBytes being ascii 7 bit
+* libmagic:	uses libmagic to match data against mime type matchType.
 	(note: matchType can be a substring. text/plain also includes text/plain; charset: utf-16)
+* string: searches for a specific 'string' either on a specific 'position' or in the complete decrypted payload
 ### Cipher suggester
 If no cipher is known the program autogenerates a suitable list of ciphers. The suggester matches ciphers whose block size matches into the cipher text.
 
@@ -34,11 +35,6 @@ encrack -i ./secret.txt.enc -w ./wordlist.txt -m firstascii
 ```
 encrack -i ./secretpic.jpg.enc -w ./wordlist.txt -m libmagic -o matchType=image/jpeg 
 ```
-### Suggest ciphers
-* Output suggested ciphers for secret.txt.enc and exit
-```
-encrack -i ./secret.txt.enc -s
-```
 ### Crack textfile using specific ciphers
 * Crack secret.txt.enc 
 * Using passwords from wordlist.txt
@@ -46,6 +42,21 @@ encrack -i ./secret.txt.enc -s
 * use cipher list from ciphers.txt
 ```
 encrack -i ./secret.txt.enc -w ./wordlist.txt -m firstascii -c ./ciphers.txt
+```
+### Crack subject, search for a specific string
+* crack 2nd_pm.s3m.enc (which is a encrypted S3M music module)
+* Using passwords from wordlist.txt
+* match for the SCRM magic at position 44 which is specific for this file format
+* use cipher list from ciphers_cbc.txt
+```
+./encrack -i ./2nd_pm.s3m.enc -w ./wordlist.txt -m string -o string='SCRM' -o position=44 -c ./ciphers_cbc.txt
+```
+
+
+### Suggest ciphers
+* Output suggested ciphers for secret.txt.enc and exit
+```
+encrack -i ./secret.txt.enc -s
 ```
 
 ## example output

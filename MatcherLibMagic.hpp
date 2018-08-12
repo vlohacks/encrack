@@ -14,7 +14,7 @@ private:
 public:
     MatcherLibMagic(const MatcherOptions& options);
     ~MatcherLibMagic();
-    bool match(const unsigned char* pt, size_t size) const;
+    bool match(const unsigned char* pt, const size_t size) const;
 };
 
 #endif

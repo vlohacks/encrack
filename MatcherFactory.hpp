@@ -7,6 +7,7 @@
 #include "MatcherOptions.hpp"
 #include "MatcherFirstAscii.hpp"
 #include "MatcherLibMagic.hpp"
+#include "MatcherString.hpp"
 
 class MatcherFactory 
 {
@@ -17,10 +18,11 @@ private:
         const char* description;
     } matcher_description_t;
     
-    static constexpr int numMatchers = 2;
+    static constexpr int numMatchers = 3;
     static constexpr matcher_description_t _availableMatchers[numMatchers] = {
         { "firstascii", "Matches the first numBytes for being 7 bit clean" },
-        { "libmagic", "Uses libmagic to match the cleartext against given mimetype 'matchType'" }
+        { "libmagic", "Uses libmagic to match the cleartext against given mimetype 'matchType'" },
+        { "string", "searches for a specific 'string', either at a specific 'position' or in the whole plaintext if no position is specified" }
     };
     
 public:

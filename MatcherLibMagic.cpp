@@ -23,7 +23,7 @@ MatcherLibMagic::~MatcherLibMagic()
 }
     
 
-bool MatcherLibMagic::match(const unsigned char * pt, size_t size) const
+bool MatcherLibMagic::match(const unsigned char* pt, const size_t size) const
 {
     const char * magicStr;
 
