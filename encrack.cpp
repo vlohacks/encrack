@@ -152,7 +152,7 @@ int main(int argc, char** argv)
     
     printf("* Running %d thread(s)...\n", numThreads);
     for (i = 0; i < numThreads; i++) {
-        Worker* worker = new Worker(subject, passwordList, cipherList, i, numThreads, matcherName, matcherOptions);
+        Worker* worker = new Worker(subject, passwordList, cipherList, i, matcherName, matcherOptions);
         workers.push_back(worker);
         worker->run();
     }
