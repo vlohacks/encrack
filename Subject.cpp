@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <stdexcept>
 
 Subject::Subject()
     : _cipherText(nullptr)
@@ -33,9 +34,8 @@ void Subject::loadFile(const char* filename)
 
     fread(tmp, strlen(magic), 1, f);
     if (memcmp(tmp, magic, sizeof(tmp))) {
-        fprintf(stderr, "Error: bad magic: %s\n", tmp);
         fclose(f);
-        return;
+        throw std::runtime_error("Error loading file: bad magic");
     }
     fread(_salt, PKCS5_SALT_LEN, 1, f);
 
